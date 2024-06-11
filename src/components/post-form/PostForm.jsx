@@ -22,9 +22,11 @@ export default function PostForm({ post }) {
 
     const submit = async (data) => {
         let fileId;
-        if (data.image && data.image.length > 0) {
+        if (data.image?.[0]) {
             const fileResponse = await dispatch(uploadFile(data.image[0])).unwrap();
-            fileId = fileResponse.$id;
+            if (fileResponse && fileResponse.$id) {
+                fileId = fileResponse.$id;
+            }
         }
 
         if (post) {
@@ -38,27 +40,31 @@ export default function PostForm({ post }) {
             };
 
             const response = await dispatch(updatePost({ slug: post.$id, post: updatedPost })).unwrap();
-            navigate(`/post/${response.$id}`);
+            if (response && response.$id) {
+                navigate(`/post/${response.$id}`);
+            }
         } else {
             const newPost = {
                 ...data,
                 featuredImage: fileId,
-                userId: userData.$id,
+                userId: userData?.$id,
             };
 
             const response = await dispatch(createPost(newPost)).unwrap();
-            navigate(`/post/${response.$id}`);
+            if (response && response.$id) {
+                navigate(`/post/${response.$id}`);
+            }
         }
     };
 
     const slugTransform = useCallback((value) => {
-        if (value && typeof value === "string")
+        if (value && typeof value === "string") {
             return value
                 .trim()
                 .toLowerCase()
                 .replace(/[^a-zA-Z\d\s]+/g, "-")
                 .replace(/\s/g, "-");
-
+        }
         return "";
     }, []);
 
@@ -100,7 +106,7 @@ export default function PostForm({ post }) {
                     accept="image/png, image/jpg, image/jpeg, image/gif"
                     {...register("image", { required: !post })}
                 />
-                {post && (
+                {post && post.featuredImage && (
                     <div className="w-full mb-4">
                         <img
                             src={`https://your-appwrite-endpoint/v1/storage/files/${post.featuredImage}/preview`} // Replace with your Appwrite endpoint

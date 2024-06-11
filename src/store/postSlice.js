@@ -19,8 +19,8 @@ export const fetchPost = createAsyncThunk('posts/fetchPost', async (slug) => {
     throw new Error("Failed to fetch post");
 });
 
-export const createPost = createAsyncThunk('posts/createPost', async (post) => {
-    const response = await appwriteService.createPost(post);
+export const createPost = createAsyncThunk('posts/createPost', async ({ title, slug, content, featuredImage, status, userId }) => {
+    const response = await appwriteService.createPost({ title, slug, content, featuredImage, status, userId });
     if (response) {
         return response;
     }
